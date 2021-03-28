@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".activity.UserActivity"
+    tools:showIn="@layout/activity_user">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+            <LinearLayout
+                android:id="@+id/userWorksTitle"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:orientation="horizontal"
+                >
+                <Button
+                    android:id="@+id/workTitleButton"
+                    android:text="作品 10"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    />
+                <Button
+                    android:id="@+id/otherTitleButton"
+                    android:text="其他按键"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    />
+            </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/changeModeBar"
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:layout_below="@id/userWorksTitle"
+            android:max="100"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:progressDrawable="@drawable/progressbar_bg"
+            android:secondaryProgress="50"
+            />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/userWorks"
+            android:layout_below="@id/changeModeBar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+    </RelativeLayout>
+
+
+
+</androidx.core.widget.NestedScrollView>
