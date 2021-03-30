@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="40dp">
+
+    <TextView
+        android:id="@+id/videoToPlayTime"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:text="2020-3-30"
+        android:layout_marginRight="20dp"
+        android:textSize="10sp"
+        android:gravity="center"
+        />
+
+    <TextView
+        android:id="@+id/videoToPlayAuthor"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:text="测试作者"
+        android:layout_marginRight="20dp"
+        android:layout_toLeftOf="@id/videoToPlayTime"
+        android:textSize="10sp"
+        android:gravity="center"
+        />
+
+    <TextView
+        android:id="@+id/videoToPlayTitle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_toLeftOf="@id/videoToPlayAuthor"
+        android:text="测试标题"
+        android:textSize="10sp"
+        android:gravity="center"
+        />
+
+    <View
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#000000"
+        android:layout_marginRight="20dp"
+        android:layout_marginLeft="20dp"
+        />
+
+
+</RelativeLayout>

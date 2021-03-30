@@ -38,7 +38,7 @@ class WorksAdapter(val workList:ArrayList<Work>,val mStaggeredGridLayoutManager:
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val work:Work=workList[position]
         holder.workTitle.text=work.workTitle
-        //此处的视频卡封面需要联网加载 work.workCoverSrc
+        //视频卡封面联网加载
         //holder.workCover.setImageResource(R.drawable.ic_baseline_more_horiz_24)
         Picasso.with(mContext)
             .load("https://p0.qhimg.com/t015f3654b694ad2f8a.jpg") //TODO 加载地址,work.workCoverSrc

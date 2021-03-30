@@ -1,6 +1,7 @@
 package com.example.everyonecan
 
 import com.example.everyonecan.util.StringAndIntUtil
+import java.util.*
 
 
 /**
@@ -13,13 +14,15 @@ class Work {
     lateinit var workTitle:String
     lateinit var workCoverSrc:String
     lateinit var workAddressSrc:String
+    lateinit var workUpdateTime:Date
     constructor(
         workId: String,
         workAuthor: String,
         workAuthorId: String,
         workTitle: String,
         workCoverSrc: String,
-        workAddressSrc: String
+        workAddressSrc: String,
+        workUpdateTime:Date
     ) {
         if(StringAndIntUtil.StringIsInt(workId)){
             this.workId = workId
@@ -35,6 +38,7 @@ class Work {
         this.workTitle = workTitle
         this.workCoverSrc = workCoverSrc
         this.workAddressSrc = workAddressSrc
+        this.workUpdateTime=workUpdateTime
     }
 
 }
