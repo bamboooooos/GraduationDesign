@@ -17,6 +17,7 @@ import kotlinx.android.synthetic.main.content_scrolling.*
 
 class UserActivity : AppCompatActivity() {
 
+    var isMyself:Boolean=false
     lateinit var UserId:String
     lateinit var UserName:String
     var userWorkTitleMode:Int=0  //0为作品页，1为其他按钮页
@@ -26,11 +27,6 @@ class UserActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user)
         setSupportActionBar(findViewById(R.id.toolbar))
-        findViewById<CollapsingToolbarLayout>(R.id.toolbar_layout).title = title
-        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-        }
         initDate()
         initView()
         initListener()
@@ -38,12 +34,23 @@ class UserActivity : AppCompatActivity() {
 
     fun initDate(){
         var intent:Intent=getIntent()
+        isMyself=intent.getBooleanExtra("isMyself",false)
         UserName=if(intent.getStringExtra("userName")!=null) intent.getStringExtra("userName")!! else "默认用户名"
         UserId=if(intent.getStringExtra("userId")!=null) intent.getStringExtra("userId")!! else "00000"
         initTestData()
         //TODO 根据用户id获取用户其他数据，此处有网络请求
     }
     fun initView(){
+        findViewById<CollapsingToolbarLayout>(R.id.toolbar_layout).title = title
+        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
+            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show()
+        }
+        if(isMyself){
+            initOwnView()
+        }else{
+            initGuestView()
+        }
         userName.text=UserName
         userIdInCan.text="用户id:"+UserId
         var workRecyclerView:RecyclerView=userWorks
@@ -54,8 +61,9 @@ class UserActivity : AppCompatActivity() {
         //设置每个item的padding
         val duration:SpacesItemDecoration= SpacesItemDecoration(4)
         workRecyclerView.addItemDecoration(duration)
-        val worksAdapter:WorksAdapter= WorksAdapter(workList,layoutManager)
+        val worksAdapter:WorksAdapter= WorksAdapter(workList,layoutManager,this)
         workRecyclerView.adapter=worksAdapter
+
     }
     fun initListener(){
         userBack.setOnClickListener {
@@ -78,6 +86,15 @@ class UserActivity : AppCompatActivity() {
             }
         }
     }
+
+    fun initOwnView(){
+        //TODO 初始化“我的”页面特有的控件
+    }
+
+    fun initGuestView(){
+        //TODO 初始化“游客”页面特有的控件
+    }
+
     fun initTestData(){
         repeat(4) {
             workList.add(Work("0001","测试作者1","1001","测试视频卡1","src","src"))
