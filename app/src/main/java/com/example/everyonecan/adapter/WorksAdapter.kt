@@ -41,7 +41,7 @@ class WorksAdapter(val workList:ArrayList<Work>,val mStaggeredGridLayoutManager:
         //视频卡封面联网加载
         //holder.workCover.setImageResource(R.drawable.ic_baseline_more_horiz_24)
         Picasso.with(mContext)
-            .load("https://p0.qhimg.com/t015f3654b694ad2f8a.jpg") //TODO 加载地址,work.workCoverSrc
+            .load(work.workCoverSrc) //加载地址,work.workCoverSrc
             .placeholder(R.mipmap.ic_launcher)
             .error(R.mipmap.ic_launcher) //加载失败的图
             .fit() //充满

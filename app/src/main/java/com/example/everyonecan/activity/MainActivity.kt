@@ -131,4 +131,7 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         GSYVideoManager.releaseAllVideos()
     }
+
+
+
 }
