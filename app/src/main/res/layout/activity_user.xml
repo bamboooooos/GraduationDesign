@@ -78,7 +78,7 @@
 
                 <TextView
                     android:id="@+id/userFansNumber"
-                    android:text="粉丝 20w"
+                    android:text="粉丝 0"
                     android:textSize="16dp"
                     android:layout_toRightOf="@id/userHead"
                     android:layout_below="@id/userTalk"
@@ -89,7 +89,7 @@
 
                 <TextView
                     android:id="@+id/userIdInCan"
-                    android:text="用户id:123456789"
+                    android:text="用户id:0000"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/userHead"
@@ -99,7 +99,7 @@
 
                 <TextView
                     android:id="@+id/userLikeNumber"
-                    android:text="❤ 20"
+                    android:text="❤ 0"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignTop="@id/userIdInCan"

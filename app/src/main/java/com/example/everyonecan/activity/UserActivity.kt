@@ -2,33 +2,50 @@ package com.example.everyonecan.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.bumptech.glide.Glide
 import com.example.everyonecan.R
+import com.example.everyonecan.User
 import com.example.everyonecan.Work
 import com.example.everyonecan.adapter.WorksAdapter
+import com.example.everyonecan.api.GetUserData
+import com.example.everyonecan.rxjava.RxSubscribe
+import com.example.everyonecan.util.RxUtil
 import com.example.everyonecan.view.SpacesItemDecoration
+import com.squareup.picasso.Picasso
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_user.*
 import kotlinx.android.synthetic.main.content_scrolling.*
+import okhttp3.ResponseBody
+import retrofit2.Retrofit
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class UserActivity : AppCompatActivity() {
 
     var isMyself:Boolean=false
     lateinit var UserId:String
-    lateinit var UserName:String
+    lateinit var mUser:User
     var userWorkTitleMode:Int=0  //0为作品页，1为其他按钮页
     var videoToPlayArrayList:ArrayList<Work> = ArrayList()
+    lateinit var retrofit:Retrofit
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user)
         setSupportActionBar(findViewById(R.id.toolbar))
+        retrofit=RxUtil.initRetrofit(RxUtil.initHttpConfig(applicationContext),LoginActivity.baseUrl)
         initDate()
         initView()
         initListener()
@@ -37,10 +54,40 @@ class UserActivity : AppCompatActivity() {
     fun initDate(){
         var intent:Intent=getIntent()
         isMyself=intent.getBooleanExtra("isMyself",false)
-        UserName=if(intent.getStringExtra("userName")!=null) intent.getStringExtra("userName")!! else "默认用户名"
-        UserId=if(intent.getStringExtra("userId")!=null) intent.getStringExtra("userId")!! else "00000"
+        UserId=MainActivity.userId
         initTestData()
         //TODO 根据用户id获取用户其他数据，此处有网络请求
+        var mApi=retrofit.create(GetUserData::class.java)
+        var observable:Observable<User> =mApi.getUserById(UserId)
+        observable.subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object: RxSubscribe<User>(){
+                //成功逻辑
+                override fun onSuccess(t: User) {
+                    mUser=t
+                    var user=t
+                    Log.d("lin", user.toString())
+                    userName.text=user.userName
+                    userTalk.text=user.userMotto
+                    userFansNumber.text="粉丝数"+user.userFans
+                    userIdInCan.text="用户id:"+user.userId
+                    userLikeNumber.text="❤"+user.userAdmire
+                    Picasso.with(this@UserActivity)
+                        .load(user.userPhoto) //加载地址
+//                        .load("https://p0.qhimg.com/t015f3654b694ad2f8a.jpg")
+                        .placeholder(R.drawable.loading) //加载
+                        .error(R.drawable.error) //加载失败的图
+                        .tag(this@UserActivity)
+                        .fit()
+                        .into(userHead)//加载
+                }
+
+                //提示逻辑
+                override fun onHint(hint: String) {
+                    Toast.makeText(application,hint, Toast.LENGTH_SHORT).show()
+                }
+            })
+
     }
     fun initView(){
         findViewById<CollapsingToolbarLayout>(R.id.toolbar_layout).title = title
@@ -53,8 +100,6 @@ class UserActivity : AppCompatActivity() {
         }else{
             initGuestView()
         }
-        userName.text=UserName
-        userIdInCan.text="用户id:"+UserId
         var workRecyclerView:RecyclerView=userWorks
         val layoutManager=StaggeredGridLayoutManager(3,StaggeredGridLayoutManager.VERTICAL)
         workRecyclerView.layoutManager=layoutManager
@@ -95,6 +140,10 @@ class UserActivity : AppCompatActivity() {
 
     fun initGuestView(){
         //TODO 初始化“游客”页面特有的控件
+    }
+
+    fun initUserData(){
+        
     }
 
     fun initTestData(){

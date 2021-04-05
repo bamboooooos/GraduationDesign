@@ -32,6 +32,11 @@ class MainActivity : AppCompatActivity() {
     lateinit var mAdapter: MainPlayerAdapter
     var videoToPlayArrayList:ArrayList<Work> = ArrayList()
 
+    companion object{
+        public lateinit var userId:String
+        public lateinit var userName:String
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -41,6 +46,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun initData(){
+        MainActivity.userId=if(intent.getStringExtra("userId")!=null) intent.getStringExtra("userId")!! else "0000"
+        //TODO 根据userId获取用户播放列表
         initTestData()
     }
 
@@ -58,16 +65,12 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this,"触发我的点击事件", Toast.LENGTH_SHORT).show()
             val intentToBloger:Intent=Intent(this,UserActivity().javaClass)
             intentToBloger.putExtra("isMyself",true)
-            intentToBloger.putExtra("userName","测试用户名(我的)")
-            intentToBloger.putExtra("userId","00002")
             startActivity(intentToBloger)
         }
         blogger.setOnClickListener {
             //TODO 点击进入“博主”页面
             Toast.makeText(this,"触发博主点击事件",Toast.LENGTH_SHORT).show()
             val intentToBloger:Intent=Intent(this,UserActivity().javaClass)
-            intentToBloger.putExtra("userName","测试用户名(博主)")
-            intentToBloger.putExtra("userId","00001")
             startActivity(intentToBloger)
         }
         toRead.setOnClickListener {
@@ -131,7 +134,5 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         GSYVideoManager.releaseAllVideos()
     }
-
-
 
 }
