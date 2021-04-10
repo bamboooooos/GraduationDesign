@@ -5,10 +5,40 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/videoToPlayList"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+        android:layout_height="400dp"
+        >
+
+        <TextView
+            android:id="@+id/listTitle"
+            android:text="播放列表"
+            android:textSize="20sp"
+            android:textColor="#666666"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            />
+
+        <View
+            android:id="@+id/listLine"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#666666"
+            android:layout_below="@id/listTitle"
+            android:layout_marginLeft="80dp"
+            android:layout_marginRight="80dp"
+            />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/videoToPlayList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/listLine"
+            android:layout_marginTop="10dp"
+            />
+
+    </RelativeLayout>
 
 </FrameLayout>

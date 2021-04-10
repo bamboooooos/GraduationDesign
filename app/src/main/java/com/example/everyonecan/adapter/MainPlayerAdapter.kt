@@ -2,6 +2,7 @@ package com.example.everyonecan.adapter
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -49,6 +50,8 @@ class MainPlayerAdapter(val videoList:ArrayList<Work>):RecyclerView.Adapter<Main
         holder.videoPlayer.setUp(videoList[position].workAddressSrc,false,videoList[position].workTitle)
         //holder.videoPlayer.startPlayLogic()
     }
+
+
 
     inner class ViewHolder(view: View):RecyclerView.ViewHolder(view){
         lateinit var coverIma:ImageView

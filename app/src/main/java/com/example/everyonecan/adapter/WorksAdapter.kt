@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.view.ViewGroup.MarginLayoutParams
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.everyonecan.R
@@ -26,11 +27,8 @@ class WorksAdapter(val workList:ArrayList<Work>,val mStaggeredGridLayoutManager:
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view=LayoutInflater.from(parent.context).inflate(R.layout.item_work,parent,false)
         val viewHolder=ViewHolder(view)
-        viewHolder.workCover.setOnClickListener {
-            //TODO 封面点击事件
-        }
-        viewHolder.workTitle.setOnClickListener {
-            //TODO 标题点击事件
+        viewHolder.itemView.setOnClickListener {
+            Toast.makeText(mContext,"点击:"+viewHolder.workTitle.text,Toast.LENGTH_SHORT).show()
         }
         return viewHolder
     }

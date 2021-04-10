@@ -28,8 +28,8 @@ object RxUtil {
                 }
                 val response=chain.proceed(request)
                 if(NetworkUtils.isAvailable(context)){
-                    //有网络情况下，超过一分钟则重新请求，否则使用缓存数据
-                    val maxAge=60
+                    //有网络情况下，超过时间则重新请求，否则使用缓存数据
+                    val maxAge=0
                     var cacheControl:String="public,max-age="+maxAge
                     return response.newBuilder()
                         .header("Cache-Control",cacheControl)

@@ -14,7 +14,7 @@ class Work {
     lateinit var workTitle:String
     lateinit var workCoverSrc:String
     lateinit var workAddressSrc:String
-    lateinit var workUpdateTime:Date
+    lateinit var workUpdateTime:String
     constructor(
         workId: String,
         workAuthor: String,
@@ -22,7 +22,7 @@ class Work {
         workTitle: String,
         workCoverSrc: String,
         workAddressSrc: String,
-        workUpdateTime:Date
+        workUpdateTime:String
     ) {
         if(StringAndIntUtil.StringIsInt(workId)){
             this.workId = workId
@@ -41,4 +41,7 @@ class Work {
         this.workUpdateTime=workUpdateTime
     }
 
+    override fun toString(): String {
+        return workId+","+workAuthor+","+workAuthorId+","+workTitle+","+workCoverSrc+","+workAddressSrc+","+workUpdateTime
+    }
 }

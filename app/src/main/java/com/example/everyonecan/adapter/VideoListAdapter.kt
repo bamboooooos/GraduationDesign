@@ -35,6 +35,6 @@ class VideoListAdapter(var videoToShowList:ArrayList<Work>,var mContext:Context)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.videoTitle.text=videoToShowList[position].workTitle
         holder.videoAuthor.text=videoToShowList[position].workAuthor
-        holder.videoTime.text=SimpleDateFormat("yyyy-MM-dd").format(videoToShowList[position].workUpdateTime)
+        holder.videoTime.text=videoToShowList[position].workUpdateTime
     }
 }

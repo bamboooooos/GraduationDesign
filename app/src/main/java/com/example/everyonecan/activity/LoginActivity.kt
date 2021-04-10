@@ -5,34 +5,24 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import com.example.everyonecan.R
-import com.example.everyonecan.User
-import com.example.everyonecan.api.getTestData
+import com.example.everyonecan.Work
+import com.example.everyonecan.api.GetWorkData
 import com.example.everyonecan.rxjava.RxSubscribe
 import com.example.everyonecan.util.RxUtil
-import com.shuyu.gsyvideoplayer.utils.NetworkUtils
 import io.reactivex.Observable
-import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_login.*
-import kotlinx.android.synthetic.main.activity_user.*
-import okhttp3.*
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.GET
-import java.io.File
-import java.lang.Exception
-import java.util.*
-import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 
 class LoginActivity : AppCompatActivity() {
     //TODO baseUrl为服务器地址
 
     companion object {
+        //服务器地址
+//        val baseUrl: String = "http://1.116.75.147:8081/"
+        //本地测试
         val baseUrl: String = "http://192.168.31.208:8081/"
     }
     lateinit var mRetrofit: Retrofit
@@ -52,14 +42,18 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun getTestData(){
-        var mApi=mRetrofit.create(getTestData::class.java)
-        var observable:Observable<User> =mApi.getTestData()
+        var mApi=mRetrofit.create(GetWorkData::class.java)
+        var observable:Observable<ArrayList<Work>> =mApi.getPlayList("0001")
         observable.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object:RxSubscribe<User>(){
+            .subscribe(object:RxSubscribe<ArrayList<Work>>(){
                 //成功逻辑
-                override fun onSuccess(t: User) {
-                    testNetData.text=t.toString()
+                override fun onSuccess(t: ArrayList<Work>) {
+                    var toShow:String=""
+                    for(i:Work in t){
+                        toShow+=i.toString()
+                    }
+                    testNetData.text=toShow
                 }
 
                 //提示逻辑

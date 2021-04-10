@@ -28,7 +28,7 @@
                     />
                 <Button
                     android:id="@+id/otherTitleButton"
-                    android:text="其他按键"
+                    android:text="关注"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="match_parent"
