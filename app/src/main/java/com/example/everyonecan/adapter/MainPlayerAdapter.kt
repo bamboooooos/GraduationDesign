@@ -13,8 +13,10 @@ import com.example.everyonecan.R
 import com.example.everyonecan.Work
 import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer
 import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.item_video_play.view.*
 import kotlinx.android.synthetic.main.item_work.view.*
+import kotlin.time.seconds
 
 class MainPlayerAdapter(val videoList:ArrayList<Work>):RecyclerView.Adapter<MainPlayerAdapter.ViewHolder>() {
 
@@ -59,6 +61,11 @@ class MainPlayerAdapter(val videoList:ArrayList<Work>):RecyclerView.Adapter<Main
     }
 
 
+//    override fun onViewAttachedToWindow(holder: ViewHolder) {
+//        super.onViewAttachedToWindow(holder)
+//    }
 
-
+//    override fun onViewDetachedFromWindow(holder: ViewHolder) {
+//        super.onViewDetachedFromWindow(holder)
+//    }
 }

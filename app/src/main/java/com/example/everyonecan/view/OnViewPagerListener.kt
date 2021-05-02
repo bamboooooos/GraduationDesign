@@ -19,4 +19,9 @@ interface OnViewPagerListener {
      * @param isBottom
      */
     fun onPageSelected(position: Int, isBottom: Boolean)
+
+    /**
+     * 视频滑动
+     */
+    fun onVideoSlided(position: Int)
 }

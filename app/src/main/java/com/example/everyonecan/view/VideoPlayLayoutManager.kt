@@ -2,6 +2,7 @@ package com.example.everyonecan.view
 
 
 import android.content.Context
+import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
@@ -29,6 +30,7 @@ class VideoPlayLayoutManager : LinearLayoutManager, OnChildAttachStateChangeList
         view.addOnChildAttachStateChangeListener(this)
         mPagerSnapHelper!!.attachToRecyclerView(view)
         super.onAttachedToWindow(view)
+        mOnViewPagerListener!!.onInitComplete()
     }
 
     /**
@@ -66,10 +68,14 @@ class VideoPlayLayoutManager : LinearLayoutManager, OnChildAttachStateChangeList
                 val view = mPagerSnapHelper!!.findSnapView(this)
                 val position = getPosition(view!!)
                 if (mOnViewPagerListener != null) {
+                    mOnViewPagerListener!!.onVideoSlided(position)
                     mOnViewPagerListener!!.onPageSelected(position, position == itemCount - 1)
+
                 }
             }
             else -> {
+//                val view = mPagerSnapHelper!!.findSnapView(this)
+//                val position = getPosition(view!!)
             }
         }
         super.onScrollStateChanged(state)

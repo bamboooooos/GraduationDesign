@@ -37,4 +37,5 @@ class VideoListAdapter(var videoToShowList:ArrayList<Work>,var mContext:Context)
         holder.videoAuthor.text=videoToShowList[position].workAuthor
         holder.videoTime.text=videoToShowList[position].workUpdateTime
     }
+
 }

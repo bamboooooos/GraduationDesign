@@ -1,41 +1,51 @@
 package com.example.everyonecan.activity
 
-import android.content.AbstractThreadedSyncAdapter
+import android.annotation.TargetApi
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
+import android.os.Build
 import android.os.Bundle
+import android.transition.Transition
 import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.widget.Toast
-import androidx.core.view.get
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.OrientationHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.everyonecan.R
+import com.example.everyonecan.ResultModel
 import com.example.everyonecan.Work
 import com.example.everyonecan.adapter.MainPlayerAdapter
 import com.example.everyonecan.api.GetWorkData
 import com.example.everyonecan.listener.MyGestureDetector
+import com.example.everyonecan.listener.OnTransitionListener
 import com.example.everyonecan.rxjava.RxSubscribe
 import com.example.everyonecan.util.RxUtil
 import com.example.everyonecan.view.OnViewPagerListener
 import com.example.everyonecan.view.VideoListDialog
 import com.example.everyonecan.view.VideoPlayLayoutManager
-import com.shuyu.gsyvideoplayer.GSYVideoADManager
 import com.shuyu.gsyvideoplayer.GSYVideoManager
+import com.shuyu.gsyvideoplayer.listener.VideoAllCallBack
 import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.content_scrolling.*
-import okhttp3.internal.notifyAll
 import retrofit2.Retrofit
 import java.util.*
 import kotlin.collections.ArrayList
 
+
 class MainActivity : AppCompatActivity() {
 
+    final val TAG:String = "linlin"
+
+    private var transition: Transition? = null
+    var isGetting:Boolean=false
+    var isTouch:Boolean=false
+    var toFeedBackVideoPosition:Int=0
+    var lastPlay:Int=0
     lateinit var gestureDetector:GestureDetector
     lateinit var mRecyclerView:RecyclerView
     lateinit var mLayoutManager:VideoPlayLayoutManager
@@ -57,6 +67,7 @@ class MainActivity : AppCompatActivity() {
         initData()
         initView()
         initListener()
+        initTimer()
     }
 
     fun initData(){
@@ -95,11 +106,11 @@ class MainActivity : AppCompatActivity() {
         recording.setOnClickListener {
             //TODO 点击录制我的视频
             Toast.makeText(this,"触发录制点击事件",Toast.LENGTH_SHORT).show()
+
         }
         gestureDetector= GestureDetector(this,MyGestureDetector(this))
         mLayoutManager.setOnViewPagerListener(object:OnViewPagerListener{
             override fun onInitComplete() {
-
             }
 
             override fun onPageRelease(isNext: Boolean, position: Int) {
@@ -110,11 +121,70 @@ class MainActivity : AppCompatActivity() {
             override fun onPageSelected(position: Int, isBottom: Boolean) {
                 val videoPlayer:StandardGSYVideoPlayer=video_play_recyclerview.findViewById(R.id.video_view)
                 videoPlayer.startPlayLogic()
+//                initTransition(videoPlayer)
+                videoPlayer.isLooping=true
+                renewPlayList()
+//                playNow=position
+            }
+
+            override fun onVideoSlided(position: Int) {
                 playNow=position
                 Log.d("linlin", "播放:"+playNow)
-                renewPlayList()
             }
         })
+    }
+
+//    private fun initTransition(videoPlayer:StandardGSYVideoPlayer) {
+//        Log.d(TAG, "initTransition:")
+//        postponeEnterTransition()
+//        ViewCompat.setTransitionName(videoPlayer, "IMG_TRANSITION")
+//        addTransitionListener(videoPlayer)
+//        startPostponedEnterTransition()
+//    }
+//
+//    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+//    private fun addTransitionListener(videoPlayer:StandardGSYVideoPlayer): Boolean {
+//        transition = window.sharedElementEnterTransition
+//        Log.d(TAG, "addTransitionListener:")
+//        if (transition != null) {
+//            transition!!.addListener(object : OnTransitionListener() {
+//                override fun onTransitionEnd(transition: Transition) {
+//                    Log.d(TAG, "onTransitionEnd:")
+//                    super.onTransitionEnd(transition)
+//                    videoPlayer.startPlayLogic()
+//                    transition.removeListener(this)
+//                }
+//            })
+//            return true
+//        }
+//        Log.d(TAG, "false")
+//        return false
+//    }
+
+
+    private fun initTimer(){
+        Timer("TestVideoIsChange").schedule(object:TimerTask(){
+            var allDuration=1000
+            var duration=0
+            var lastPlay:Int=0
+            override fun run() {
+                val videoPlayer:StandardGSYVideoPlayer=video_play_recyclerview.findViewById(R.id.video_view)
+                if(lastPlay!= playNow){//视频已经滑动
+                    //TODO 调用反馈
+                    var seedingRate:Int=((duration.toDouble())/(allDuration.toDouble())).toInt()
+                    feedbackVideo(videoToPlayArrayList[playNow].workId, userId,seedingRate,true)
+//                    Log.d(TAG, "调用反馈机制:"+(duration.toDouble())/(allDuration.toDouble()))
+                    lastPlay= playNow
+                    duration=0
+                    allDuration=1000
+                }else{
+                    allDuration=videoPlayer.duration
+                    Log.d(TAG, "视频总长:"+allDuration)
+                    duration=videoPlayer.currentPositionWhenPlaying
+                    Log.d(TAG, "当前播放:"+duration)
+                }
+            }
+        },1000,1000)
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -179,22 +249,36 @@ class MainActivity : AppCompatActivity() {
      * videoToPlayArrayList
      */
     fun renewPlayList(){
-        repeat(GET_VIDEO_LINE + 1 + playNow - videoToPlayArrayList.size){
-            getOneNewVideo()
+        if(isGetting){
+
+        }else {
+            isGetting=true
+            Log.d(TAG, "renew正在获取置为true")
+            val repeatTime=GET_VIDEO_LINE + 1 + playNow - videoToPlayArrayList.size
+            if(repeatTime<=0) isGetting=false
+            Log.d(TAG, "renew正在获取置为false")
+            repeat(repeatTime) {
+                getOneNewVideo()
+            }
         }
     }
 
     private fun getOneNewVideo(){
         var mApi=retrofit.create(GetWorkData::class.java)
-        var observable: Observable<Work> =mApi.getOneNewVideo(MainActivity.userId)
+        Log.d(TAG, "获取id:"+ userId)
+        var observable: Observable<ResultModel> =mApi.getRecommendVideoId(MainActivity.userId)
         observable.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object: RxSubscribe<Work>(){
+            .subscribe(object: RxSubscribe<ResultModel>(){
                 //成功逻辑
-                override fun onSuccess(t:Work) {
-                    videoToPlayArrayList.add(t)
-                    Log.d("linlin", "获取:"+t.workId)
-                    mAdapter.notifyDataSetChanged()
+                override fun onSuccess(t:ResultModel) {
+                    getVideoByRecommendId(t.data as String)
+                    Log.d("linlin", "id获取:"+t)
+                }
+
+                override fun onError(e: Throwable) {
+                    super.onError(e)
+                    Log.d("linlin", "id获取失败 ")
                 }
 
                 //提示逻辑
@@ -203,5 +287,59 @@ class MainActivity : AppCompatActivity() {
                 }
             })
     }
+
+    private fun getVideoByRecommendId(videoId:String){
+        var mApi=retrofit.create(GetWorkData::class.java)
+        var observable: Observable<Work> =mApi.getVideoById(videoId)
+        observable.subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object: RxSubscribe<Work>(){
+                //成功逻辑
+                override fun onSuccess(t:Work) {
+                    videoToPlayArrayList.add(t)
+                    Log.d("linlin", "视频获取:"+t.workId)
+                    mAdapter.notifyDataSetChanged()
+                    isGetting=false
+                    Log.d(TAG, "success正在获取置为false")
+                }
+
+                override fun onError(e: Throwable) {
+                    super.onError(e)
+                    Log.d("linlin", "视频获取失败 ")
+                    isGetting=false
+                    Log.d(TAG, "error正在获取置为false")
+                }
+
+                //提示逻辑
+                override fun onHint(hint: String) {
+                    Toast.makeText(application,hint, Toast.LENGTH_SHORT).show()
+                }
+            })
+    }
+
+    private fun feedbackVideo(videoId:String, userId:String, seedingRate:Int, isLike:Boolean){
+        var mApi=retrofit.create(GetWorkData::class.java)
+        var observable: Observable<ResultModel> =mApi.feedbackVideo(videoId,userId,seedingRate,isLike)
+        observable.subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object: RxSubscribe<ResultModel>(){
+                //成功逻辑
+                override fun onSuccess(t:ResultModel) {
+                    Log.d("linlin", "反馈成功")
+                }
+
+                override fun onError(e: Throwable) {
+                    super.onError(e)
+                    Log.d("linlin", "反馈失败")
+                }
+
+                //提示逻辑
+                override fun onHint(hint: String) {
+                    Toast.makeText(application,hint, Toast.LENGTH_SHORT).show()
+                }
+            })
+    }
+
+
 
 }

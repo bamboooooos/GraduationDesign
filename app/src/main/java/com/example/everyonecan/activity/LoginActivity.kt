@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import com.example.everyonecan.R
+import com.example.everyonecan.User
 import com.example.everyonecan.Work
 import com.example.everyonecan.api.GetWorkData
 import com.example.everyonecan.rxjava.RxSubscribe
@@ -23,7 +24,7 @@ class LoginActivity : AppCompatActivity() {
         //服务器地址
 //        val baseUrl: String = "http://1.116.75.147:8081/"
         //本地测试
-        val baseUrl: String = "http://192.168.31.208:8081/"
+        val baseUrl: String = "http://192.168.31.239:8081/"
     }
     lateinit var mRetrofit: Retrofit
     var userId:String="0002"
@@ -42,18 +43,15 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun getTestData(){
-        var mApi=mRetrofit.create(GetWorkData::class.java)
-        var observable:Observable<ArrayList<Work>> =mApi.getPlayList("0001")
+        var mApi=mRetrofit.create(com.example.everyonecan.api.getTestData::class.java)
+        var observable:Observable<User> =mApi.getTestData()
         observable.subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object:RxSubscribe<ArrayList<Work>>(){
+            .subscribe(object:RxSubscribe<User>(){
                 //成功逻辑
-                override fun onSuccess(t: ArrayList<Work>) {
+                override fun onSuccess(t: User) {
                     var toShow:String=""
-                    for(i:Work in t){
-                        toShow+=i.toString()
-                    }
-                    testNetData.text=toShow
+                    testNetData.text=t.toString()
                 }
 
                 //提示逻辑
