@@ -26,8 +26,7 @@
         android:layout_marginBottom="50dp"
         android:layout_marginRight="10dp"
         android:backgroundTint="@android:color/transparent"
-        app:civ_border_width="1dp"
-        android:src="@mipmap/ic_launcher"
+        android:src="@drawable/myself"
         />
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -39,8 +38,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
         android:backgroundTint="@android:color/transparent"
-        app:civ_border_width="1dp"
-        android:src="@mipmap/ic_launcher"
+        android:src="@drawable/author"
         />
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -52,8 +50,7 @@
         android:layout_marginBottom="50dp"
         android:layout_marginLeft="10dp"
         android:backgroundTint="@android:color/transparent"
-        app:civ_border_width="1dp"
-        android:src="@mipmap/ic_launcher"
+        android:src="@drawable/playlist"
         />
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -65,7 +62,6 @@
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
         android:backgroundTint="@android:color/transparent"
-        app:civ_border_width="1dp"
         android:src="@mipmap/add2"
         />
 
