@@ -1,9 +1,16 @@
 package com.example.everyonecan.activity
 
+import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
@@ -11,12 +18,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.example.everyonecan.R
+import com.example.everyonecan.ResultModel
 import com.example.everyonecan.User
 import com.example.everyonecan.Work
 import com.example.everyonecan.adapter.WorksAdapter
 import com.example.everyonecan.api.GetUserData
 import com.example.everyonecan.api.GetWorkData
 import com.example.everyonecan.rxjava.RxSubscribe
+import com.example.everyonecan.util.ActivityCollector
 import com.example.everyonecan.util.RxUtil
 import com.example.everyonecan.view.SpacesItemDecoration
 import com.squareup.picasso.Picasso
@@ -38,11 +47,13 @@ class UserActivity : AppCompatActivity() {
     var videoToPlayArrayList:ArrayList<Work> = ArrayList()
     lateinit var retrofit:Retrofit
     lateinit var worksAdapter:WorksAdapter
+    val TAG:String="linlin"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user)
         setSupportActionBar(findViewById(R.id.toolbar))
+        ActivityCollector.addActivity(this)
         retrofit=RxUtil.initRetrofit(RxUtil.initHttpConfig(applicationContext),LoginActivity.baseUrl)
         initDate()
         initView()
@@ -63,10 +74,10 @@ class UserActivity : AppCompatActivity() {
     }
     fun initView(){
         findViewById<CollapsingToolbarLayout>(R.id.toolbar_layout).title = title
-        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-        }
+//        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
+//            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                .setAction("Action", null).show()
+//        }
         if(isMyself){
             initOwnView()
         }else{
@@ -107,7 +118,22 @@ class UserActivity : AppCompatActivity() {
     }
 
     fun initOwnView(){
-        //TODO 初始化“我的”页面特有的控件
+        iv_logout.visibility= View.VISIBLE
+        iv_logout.setOnClickListener {
+            AlertDialog.Builder(this).setTitle("是否注销当前账号？")
+                .setPositiveButton("确认",object:DialogInterface.OnClickListener{
+                    override fun onClick(dialog: DialogInterface?, which: Int) {
+                        logout()
+                    }
+                })
+                .setNegativeButton("取消",object:DialogInterface.OnClickListener{
+                    override fun onClick(dialog: DialogInterface?, which: Int) {
+                        return
+                    }
+                })
+                .setCancelable(false)
+                .create().show()
+        }
     }
 
     fun initGuestView(){
@@ -183,5 +209,39 @@ class UserActivity : AppCompatActivity() {
             videoToPlayArrayList.add(Work("0009","测试作者9","1009","武汉加油9","https://p0.qhimg.com/t015f3654b694ad2f8a.jpg","https://v-cdn.zjol.com.cn/276990.mp4",Date().toString()))
             videoToPlayArrayList.add(Work("0010","测试作者10","1010","武汉加油10","https://p0.qhimg.com/t015f3654b694ad2f8a.jpg","https://v-cdn.zjol.com.cn/276991.mp4",Date().toString()))
         }
+    }
+
+    private fun logout(){
+        var sp: SharedPreferences =getSharedPreferences("user", Context.MODE_PRIVATE)
+        var uuid=sp.getString("uuid", "0000")!!
+        Log.d(TAG, "uuid: "+uuid)
+        if(uuid=="0000"){
+            uuid=UUID.randomUUID().toString()
+            val editor=sp.edit()
+            editor.putString("uuid",uuid)
+            editor.apply()
+        }
+        var mApi=retrofit.create(GetUserData::class.java)
+        var observable: Observable<ResultModel> =mApi.loginOrLogout(MainActivity.userId,uuid,false)
+        observable.subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object: RxSubscribe<ResultModel>(){
+                //成功逻辑
+                override fun onSuccess(t:ResultModel) {
+                    Toast.makeText(this@UserActivity,"注销成功",Toast.LENGTH_SHORT).show()
+                    ActivityCollector.finishAll()
+                    startActivity(Intent(this@UserActivity,LoginActivity::class.java))
+                }
+
+                //提示逻辑
+                override fun onHint(hint: String) {
+                    Toast.makeText(application,hint, Toast.LENGTH_SHORT).show()
+                }
+            })
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        ActivityCollector.removeActivity(this)
     }
 }

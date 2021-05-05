@@ -21,6 +21,7 @@ import com.example.everyonecan.api.GetWorkData
 import com.example.everyonecan.listener.MyGestureDetector
 import com.example.everyonecan.listener.OnTransitionListener
 import com.example.everyonecan.rxjava.RxSubscribe
+import com.example.everyonecan.util.ActivityCollector
 import com.example.everyonecan.util.RxUtil
 import com.example.everyonecan.view.OnViewPagerListener
 import com.example.everyonecan.view.VideoListDialog
@@ -41,6 +42,7 @@ class MainActivity : AppCompatActivity() {
 
     final val TAG:String = "linlin"
 
+    var timer:Timer?=null
     private var transition: Transition? = null
     var isGetting:Boolean=false
     var isTouch:Boolean=false
@@ -63,6 +65,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        ActivityCollector.addActivity(this)
         retrofit= RxUtil.initRetrofit(RxUtil.initHttpConfig(applicationContext),LoginActivity.baseUrl)
         initData()
         initView()
@@ -85,13 +88,13 @@ class MainActivity : AppCompatActivity() {
 
     fun initListener():Unit{
         myself.setOnClickListener {
-            Toast.makeText(this,"触发我的点击事件", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this,"触发我的点击事件", Toast.LENGTH_SHORT).show()
             val intentToBloger:Intent=Intent(this,UserActivity().javaClass)
             intentToBloger.putExtra("isMyself",true)
             startActivity(intentToBloger)
         }
         blogger.setOnClickListener {
-            Toast.makeText(this,"触发博主点击事件",Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this,"触发博主点击事件",Toast.LENGTH_SHORT).show()
             val intentToBloger:Intent=Intent(this,UserActivity().javaClass)
             var blogerId=if(videoToPlayArrayList.size>0) videoToPlayArrayList[playNow].workAuthorId else "0000"
             intentToBloger.putExtra("blogerId",blogerId)
@@ -99,13 +102,13 @@ class MainActivity : AppCompatActivity() {
         }
         toRead.setOnClickListener {
             //点击“待播放”视频列表
-            Toast.makeText(this,"触发待播放点击事件",Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this,"触发待播放点击事件",Toast.LENGTH_SHORT).show()
             val dialog:VideoListDialog= VideoListDialog(this,videoToPlayArrayList)
             dialog.show()
         }
         recording.setOnClickListener {
             //TODO 点击录制我的视频
-            Toast.makeText(this,"触发录制点击事件",Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this,"触发录制点击事件",Toast.LENGTH_SHORT).show()
 
         }
         gestureDetector= GestureDetector(this,MyGestureDetector(this))
@@ -163,14 +166,15 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun initTimer(){
-        Timer("TestVideoIsChange").schedule(object:TimerTask(){
+        timer=Timer("TestVideoIsChange")
+        timer!!.schedule(object:TimerTask(){
             var allDuration=1000
             var duration=0
             var lastPlay:Int=0
             override fun run() {
                 val videoPlayer:StandardGSYVideoPlayer=video_play_recyclerview.findViewById(R.id.video_view)
                 if(lastPlay!= playNow){//视频已经滑动
-                    //TODO 调用反馈
+                    //调用反馈
                     var seedingRate:Int=((duration.toDouble())/(allDuration.toDouble())).toInt()
                     feedbackVideo(videoToPlayArrayList[playNow].workId, userId,seedingRate,true)
 //                    Log.d(TAG, "调用反馈机制:"+(duration.toDouble())/(allDuration.toDouble()))
@@ -185,6 +189,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         },1000,1000)
+    }
+
+    fun destroyTimer(){
+        if(timer!=null)
+        timer!!.cancel()
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -240,7 +249,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        destroyTimer()
         GSYVideoManager.releaseAllVideos()
+        ActivityCollector.removeActivity(this)
     }
 
     /**

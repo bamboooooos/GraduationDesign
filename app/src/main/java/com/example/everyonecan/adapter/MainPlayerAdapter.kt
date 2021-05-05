@@ -36,7 +36,7 @@ class MainPlayerAdapter(val videoList:ArrayList<Work>):RecyclerView.Adapter<Main
         //封面
         val imageView:ImageView= ImageView(mContext)
         Picasso.with(mContext)
-            .load(videoList[position].workCoverSrc) //TODO 加载地址,work.workCoverSrc
+            .load(videoList[position].workCoverSrc) //加载地址,work.workCoverSrc
             .placeholder(R.mipmap.ic_launcher)
             .error(R.mipmap.ic_launcher) //加载失败的图
             .fit() //充满
