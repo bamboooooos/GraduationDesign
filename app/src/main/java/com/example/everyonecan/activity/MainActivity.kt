@@ -1,7 +1,9 @@
 package com.example.everyonecan.activity
 
+import android.Manifest
 import android.annotation.TargetApi
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.transition.Transition
@@ -10,6 +12,8 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.OrientationHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -71,6 +75,20 @@ class MainActivity : AppCompatActivity() {
         initView()
         initListener()
         initTimer()
+        applyPermission()
+    }
+
+    fun applyPermission(){
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(
+                Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO),
+                100);
+            return
+        }
     }
 
     fun initData(){
@@ -108,6 +126,7 @@ class MainActivity : AppCompatActivity() {
         }
         recording.setOnClickListener {
             //TODO 点击录制我的视频
+            startActivity(Intent(this,RecordActivity().javaClass))
 //            Toast.makeText(this,"触发录制点击事件",Toast.LENGTH_SHORT).show()
 
         }

@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.everyonecan.R
 import com.example.everyonecan.Work
+import com.example.everyonecan.activity.LoginActivity
 import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_main.*
@@ -36,10 +37,9 @@ class MainPlayerAdapter(val videoList:ArrayList<Work>):RecyclerView.Adapter<Main
         //封面
         val imageView:ImageView= ImageView(mContext)
         Picasso.with(mContext)
-            .load(videoList[position].workCoverSrc) //加载地址,work.workCoverSrc
+            .load(LoginActivity.baseUrl+"upload/EveryoneCan/"+videoList[position].workCoverSrc) //加载地址,work.workCoverSrc
             .placeholder(R.mipmap.ic_launcher)
             .error(R.mipmap.ic_launcher) //加载失败的图
-            .fit() //充满
             .tag(mContext) //标记
             .into(imageView);//加载到的ImageView
         holder.videoPlayer.thumbImageView=imageView
@@ -49,7 +49,7 @@ class MainPlayerAdapter(val videoList:ArrayList<Work>):RecyclerView.Adapter<Main
         holder.videoPlayer.backButton.setOnClickListener {
             (mContext as Activity).onBackPressed()
         }
-        holder.videoPlayer.setUp(videoList[position].workAddressSrc,false,videoList[position].workTitle)
+        holder.videoPlayer.setUp(LoginActivity.baseUrl+"upload/EveryoneCan/"+videoList[position].workAddressSrc,true,videoList[position].workTitle)
         //holder.videoPlayer.startPlayLogic()
     }
 

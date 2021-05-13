@@ -1,14 +1,18 @@
 package com.example.everyonecan.activity
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.telephony.TelephonyManager
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.everyonecan.R
 import com.example.everyonecan.ResultModel
 import com.example.everyonecan.api.GetUserData
@@ -56,7 +60,7 @@ class LoginActivity : AppCompatActivity() {
             uuid=UUID.randomUUID().toString()
             val editor=sp.edit()
             editor.putString("uuid",uuid)
-            editor.apply()
+            editor.commit()
         }
         Log.d(TAG, "uuid: "+uuid)
         return uuid
@@ -145,7 +149,8 @@ class LoginActivity : AppCompatActivity() {
                         var sp:SharedPreferences=getSharedPreferences("user", Context.MODE_PRIVATE)
                         val editor=sp.edit()
                         editor.putString("userId",userId)
-                        editor.apply()
+                        var result=editor.commit()
+                        Log.d(TAG, "onSuccess: "+result)
                         toMainActivity()
                     }else{
                         Toast.makeText(this@LoginActivity,"密码错误或者账号不存在",Toast.LENGTH_SHORT).show()
